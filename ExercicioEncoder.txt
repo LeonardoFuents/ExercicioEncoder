@@ -4,11 +4,13 @@
 #define canalA 19
 #define canalB 23
 
+int contagem = 0 ;
+
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void setup()
 {
-  lcd.init(); 
+  lcd.init();
   lcd.backlight();
   pinMode(canalA, INPUT);
   pinMode(canalB, INPUT);
@@ -16,16 +18,15 @@ void setup()
 
 void loop()
 {
-  static int estadoAnterior = 0;                                      
-  int estadoAtual = (digitalRead(canalA) << 1 | digitalRead(canalB)); 
+  static int estadoAnterior = 0;
+  int estadoAtual = (digitalRead(canalA) << 1 | digitalRead(canalB));
 
-  
   if (estadoAtual != estadoAnterior)
   {
     lcd.setCursor(0, 0);
     lcd.print("Estado: ");
     lcd.print(estadoAtual);
-    lcd.print("   "); 
+    lcd.print("   ");
 
     // Sentido horário ( 3 2 0 1 )
     if ((estadoAnterior == 3 && estadoAtual == 2) ||
@@ -33,20 +34,30 @@ void loop()
         (estadoAnterior == 0 && estadoAtual == 1) ||
         (estadoAnterior == 1 && estadoAtual == 3))
     {
+      contagem++;
       lcd.setCursor(0, 1);
       lcd.print("Sentido HORARIO     ");
+      lcd.setCursor(0, 2);
+      lcd.print("Contagem:          ");
+      lcd.setCursor(10, 2);
+      lcd.print(contagem);
     }
 
-    // Sentido anti-horário ( 3 1 0 2 )
+    // Sentido anti-horário ( 3 1 0 2 ) 
     else if ((estadoAnterior == 3 && estadoAtual == 1) ||
              (estadoAnterior == 1 && estadoAtual == 0) ||
              (estadoAnterior == 0 && estadoAtual == 2) ||
              (estadoAnterior == 2 && estadoAtual == 3))
     {
+       contagem--;
       lcd.setCursor(0, 1);
       lcd.print("Sentido ANTI-HORARIO");
+      lcd.setCursor(0, 2);
+      lcd.print("Contagem:           ");
+      lcd.setCursor(10, 2);
+      lcd.print(contagem);
     }
 
-    estadoAnterior = estadoAtual; 
+    estadoAnterior = estadoAtual;
   }
 }
