@@ -1,0 +1,52 @@
+#include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+
+#define canalA 19
+#define canalB 23
+
+LiquidCrystal_I2C lcd(0x27, 20, 4);
+
+void setup()
+{
+  lcd.init(); 
+  lcd.backlight();
+  pinMode(canalA, INPUT);
+  pinMode(canalB, INPUT);
+}
+
+void loop()
+{
+  static int estadoAnterior = 0;                                      
+  int estadoAtual = (digitalRead(canalA) << 1 | digitalRead(canalB)); 
+
+  
+  if (estadoAtual != estadoAnterior)
+  {
+    lcd.setCursor(0, 0);
+    lcd.print("Estado: ");
+    lcd.print(estadoAtual);
+    lcd.print("   "); 
+
+    // Sentido horário ( 3 2 0 1 )
+    if ((estadoAnterior == 3 && estadoAtual == 2) ||
+        (estadoAnterior == 2 && estadoAtual == 0) ||
+        (estadoAnterior == 0 && estadoAtual == 1) ||
+        (estadoAnterior == 1 && estadoAtual == 3))
+    {
+      lcd.setCursor(0, 1);
+      lcd.print("Sentido HORARIO     ");
+    }
+
+    // Sentido anti-horário ( 3 1 0 2 )
+    else if ((estadoAnterior == 3 && estadoAtual == 1) ||
+             (estadoAnterior == 1 && estadoAtual == 0) ||
+             (estadoAnterior == 0 && estadoAtual == 2) ||
+             (estadoAnterior == 2 && estadoAtual == 3))
+    {
+      lcd.setCursor(0, 1);
+      lcd.print("Sentido ANTI-HORARIO");
+    }
+
+    estadoAnterior = estadoAtual; 
+  }
+}
